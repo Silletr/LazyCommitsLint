@@ -1,19 +1,21 @@
-[project]
-name = "lcl"
+[tool.poetry]
+name = "LazyCommitsLint"
 version = "0.1.0"
 description = "Something like a Linter for commits. Will check your commit for your format and suggest correct if your current wrong"
-authors = [
-    {name = "Silletr",email = "silletr@duck.com"}
-]
-license = {text = "MIT"}
+authors = ["Silletr <silletr@duck.com>"]
+license = "MIT"
 readme = "README.md"
-requires-python = ">=3.12"
-dependencies = [
-    "typer (>=0.24.0,<0.25.0)",
-    "tomlkit (>=0.14.0,<0.15.0)"
-]
+repository = "https://github.com/Silletr/LazyCommitsLint"
+packages = [{include = "lazycommitslint", from = "src"}]
 
+[tool.poetry.dependencies]
+python = ">=3.12"
+typer = "^0.12.0"
+tomlkit = "^0.12.0"
+
+[tool.poetry.scripts]
+lazycommitslint = "lazycommitslint.cli:main"
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
+requires = ["poetry-core>=1.8.0"]
 build-backend = "poetry.core.masonry.api"
