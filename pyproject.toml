@@ -10,7 +10,7 @@ packages = [{include = "lazycommitslint", from = "src"}]
 
 [tool.poetry.dependencies]
 python = ">=3.12"
-typer = "^0.12.0"
+typer = "^0.20.0"
 tomlkit = "^0.12.0"
 
 [tool.poetry.scripts]

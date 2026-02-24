@@ -1,8 +1,6 @@
 import typer
 from .git_analyze import analyze_staged
 
-# from suggester import generate_message  # Add later
-
 app = typer.Typer()
 
 
@@ -14,9 +12,15 @@ def lint():
     for cat, files in changes.items():
         typer.echo(f"  {cat}: {', '.join(files)}")
     # TODO: REPLACE MESSAGE GENERATING WITH LLM (LLAMA)
-    msg = "[CHANGED FILE/DIR: src/lazycommitslint/git_analyze.py] Made git analyzer and mapper work"
+
+    # ONLY A PLACEHOLDER!!
+    msg = f"[{cat}: {', '.join(files)}] Made git analyzer and mapper work"
     typer.echo(f"\nSuggested message:\n{msg}")
 
 
-if __name__ == "__main__":
+def main():
     app()
+
+
+if __name__ == "__main__":
+    main()
