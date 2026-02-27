@@ -11,21 +11,49 @@ CATEGORY_MAP = {
 }
 
 
-def analyze_staged() -> Dict[str, List[str]]:
-    result = subprocess.run(
-        ["git", "diff", "--staged", "--name-status"], text=True, capture_output=True
-    )
+def analyze_all_changes() -> Dict[str, List[str]]:
+    try:
+        result = subprocess.run(
+            ["git", "status", "--porcelain", "-z"],
+            text=True,
+            capture_output=True,
+            check=True,
+        )
+    except:
+        return {}
+
+    if not result.stdout.strip():
+        return {}
+
     changes = defaultdict(list)
-    for line in result.stdout.strip().splitlines():
-        if line:
-            # Handles "R100 file1 file2"
-            status, *files = line.split(maxsplit=2)
-            cat = CATEGORY_MAP.get(status[0], "CHANGED")
-            file_list = files if len(files) > 1 else [files[0]]
-            changes[cat].extend(file_list)
-    print(f"CHANGES LIST:\n{dict(changes)}")
-    return changes  # {'NEW': ['src/foo.py'], 'CHANGED': ['README.md']}
+    parts = result.stdout.rstrip("\x00").split("\x00")  # Remove trailing nulls
+    i = 0
+    while i < len(parts) - 1:
+        status_line = parts[i]
+        if len(status_line) < 2:
+            i += 1
+            continue
+
+        status = status_line[:2]  # "MM", "M ", "A ", "??"
+        # Everything after first 2 chars
+        path = status_line[2:].lstrip()  # strip leading space after status
+
+        if path:
+            if status[0] == "?" and status[1] == "?":
+                cat = "UNTRACKED"
+            elif status[0] == " ":  # Unstaged tracked " M", "MM"
+                cat = "UNSTAGED"
+            elif status[0] in CATEGORY_MAP:
+                cat = CATEGORY_MAP[status[0]]
+            else:
+                cat = "UNKNOWN"
+            changes[cat].append(path)
+
+        i += 1  # Single entries per null
+
+    print(f"ALL CHANGES LIST:\n{dict(changes)}")
+    return dict(changes)
 
 
 if __name__ == "__main__":
-    analyze_staged()
+    analyze_all_changes()

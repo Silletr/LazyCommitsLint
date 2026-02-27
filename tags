@@ -1,0 +1,19 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/home/silletr/Projects/LazyCommitsLint/	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	//
+CATEGORY_MAP	src/lazycommitslint/git_analyze.py	/^CATEGORY_MAP = {$/;"	v
+analyze_staged	src/lazycommitslint/git_analyze.py	/^def analyze_staged() -> Dict[str, List[str]]:$/;"	f	typeref:typename:Dict[str,List[str]]
+app	src/lazycommitslint/cli.py	/^app = typer.Typer()$/;"	v
+config_file	src/lazycommitslint/config.py	/^config_file = "~\/lcl_config.toml"$/;"	v
+create_config	src/lazycommitslint/config.py	/^def create_config():$/;"	f
+lint	src/lazycommitslint/cli.py	/^def lint():$/;"	f
+main	src/lazycommitslint/cli.py	/^def main():$/;"	f
+read_config	src/lazycommitslint/config.py	/^def read_config():$/;"	f

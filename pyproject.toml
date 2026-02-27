@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "LazyCommitsLint"
+name = "LazyCommitsLint_Silletr"
 version = "0.1.0"
-description = "Something like a Linter for commits. Will check your commit for your format and suggest correct if your current wrong"
+description = "Something like a Linter for git commits."
 authors = ["Silletr <silletr@duck.com>"]
 license = "MIT"
 readme = "README.md"
