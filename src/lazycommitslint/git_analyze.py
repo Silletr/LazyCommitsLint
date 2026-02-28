@@ -11,6 +11,15 @@ CATEGORY_MAP = {
 }
 
 
+CATEGORY_MAP = {
+    "A": "NEW",
+    "D": "DELETED",
+    "M": "CHANGED",
+    "R": "RENAMED",
+    "C": "RENAMED",
+}
+
+
 def analyze_all_changes() -> Dict[str, List[str]]:
     try:
         result = subprocess.run(
@@ -19,7 +28,7 @@ def analyze_all_changes() -> Dict[str, List[str]]:
             capture_output=True,
             check=True,
         )
-    except:
+    except Exception:
         return {}
 
     if not result.stdout.strip():
@@ -51,7 +60,7 @@ def analyze_all_changes() -> Dict[str, List[str]]:
 
         i += 1  # Single entries per null
 
-    print(f"ALL CHANGES LIST:\n{dict(changes)}")
+    print(f"ALL CHANGES LIST:\n{dict(changes)}\n")
     return dict(changes)
 
 

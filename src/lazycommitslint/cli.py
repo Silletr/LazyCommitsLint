@@ -7,7 +7,6 @@ app = typer.Typer()
 @app.command()
 def lint():
     changes = analyze_all_changes()
-    typer.echo(f"ALL CHANGES LIST:\n{dict(changes)}")  # Keep your debug
 
     # Show only staged
     staged_files = changes.get("CHANGED", []) + changes.get("NEW", [])

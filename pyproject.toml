@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "LazyCommitsLint_Silletr"
-version = "0.1.0"
+name = "LazyCommitsLint"
+version = "0.1.1"
 description = "Something like a Linter for git commits."
 authors = ["Silletr <silletr@duck.com>"]
 license = "MIT"
