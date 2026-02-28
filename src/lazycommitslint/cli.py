@@ -4,30 +4,39 @@ from .git_analyze import analyze_all_changes
 app = typer.Typer()
 
 
+def print_section(title: str, categories: dict):
+    if not categories:
+        return
+    typer.echo(f"\n{title}:")
+    for cat, files in categories.items():
+        if files:
+            typer.echo(f"  {cat}: {', '.join(files)}")
+
+
 @app.command()
 def lint():
     changes = analyze_all_changes()
 
-    # Show only staged
-    staged_files = changes.get("CHANGED", []) + changes.get("NEW", [])
-    typer.echo("Staged changes:")
-    for cat, files in changes.items():
-        if cat in ["CHANGED", "NEW"]:
-            typer.echo(f"  {cat}: {', '.join(files)}")
+    staged = changes.get("staged", {})
+    unstaged = changes.get("unstaged", {})
+    untracked = changes.get("untracked", {})
 
-    if not staged_files:
-        typer.echo("No staged changes!")
+    print_section("Staged", staged)
+    print_section("Unstaged", unstaged)
+    print_section("Untracked", untracked)
+
+    if not staged:
+        typer.echo("\nNo staged changes! Stage something with `git add` first.")
         raise typer.Exit()
 
-    commit_explanation = input("What you did/fixed/etc in this commit?:\n")
+    commit_explanation = input("\nWhat did you do/fix/etc in this commit?:\n")
 
-    # Only staged categories/files
-    staged_categories = [cat for cat in ["CHANGED", "NEW"] if changes.get(cat)]
-    cat_str = ", ".join(staged_categories)
+    staged_files = [f for files in staged.values() for f in files]
+    cat_str = ", ".join(staged.keys())
     file_str = ", ".join(staged_files)
     msg = f"[{cat_str}: {file_str}] {commit_explanation}"
 
-    typer.echo(f"\nSuggested message:\n{msg}")
+    typer.echo(f"\nSuggested commit message:\n  {msg}")
 
 
 def main():

@@ -2,67 +2,80 @@ import subprocess
 from collections import defaultdict
 from typing import Dict, List
 
-CATEGORY_MAP = {
+STAGED_MAP = {
     "A": "NEW",
     "D": "DELETED",
     "M": "CHANGED",
     "R": "RENAMED",
-    "C": "RENAMED",
+    "C": "COPIED",
 }
 
-
-CATEGORY_MAP = {
-    "A": "NEW",
+UNSTAGED_MAP = {
+    "M": "MODIFIED",
     "D": "DELETED",
-    "M": "CHANGED",
-    "R": "RENAMED",
-    "C": "RENAMED",
 }
 
 
-def analyze_all_changes() -> Dict[str, List[str]]:
+def run_git(*args) -> str:
     try:
         result = subprocess.run(
-            ["git", "status", "--porcelain", "-z"],
+            ["git", *args],
             text=True,
             capture_output=True,
             check=True,
         )
-    except Exception:
-        return {}
+        return result.stdout
+    except subprocess.CalledProcessError:
+        return ""
 
-    if not result.stdout.strip():
-        return {}
 
-    changes = defaultdict(list)
-    parts = result.stdout.rstrip("\x00").split("\x00")  # Remove trailing nulls
+def analyze_all_changes() -> Dict[str, Dict[str, List[str]]]:
+    """
+    Returns:
+    {
+        "staged":   {"NEW": [...], "CHANGED": [...], ...},
+        "unstaged": {"MODIFIED": [...], "DELETED": [...]},
+        "untracked": {"UNTRACKED": [...]},
+    }
+    """
+    raw = run_git("status", "--porcelain", "-z")
+    if not raw.strip():
+        return {"staged": {}, "unstaged": {}, "untracked": {}}
+
+    staged: Dict[str, List[str]] = defaultdict(list)
+    unstaged: Dict[str, List[str]] = defaultdict(list)
+    untracked: List[str] = []
+
+    parts = raw.rstrip("\x00").split("\x00")
     i = 0
-    while i < len(parts) - 1:
-        status_line = parts[i]
-        if len(status_line) < 2:
+    while i < len(parts):
+        entry = parts[i]
+        if len(entry) < 3:
             i += 1
             continue
 
-        status = status_line[:2]  # "MM", "M ", "A ", "??"
-        # Everything after first 2 chars
-        path = status_line[2:].lstrip()  # strip leading space after status
+        x = entry[0]  # staged status
+        y = entry[1]  # unstaged status
+        path = entry[3:]  # skip "XY "
 
-        if path:
-            if status[0] == "?" and status[1] == "?":
-                cat = "UNTRACKED"
-            elif status[0] == " ":  # Unstaged tracked " M", "MM"
-                cat = "UNSTAGED"
-            elif status[0] in CATEGORY_MAP:
-                cat = CATEGORY_MAP[status[0]]
-            else:
-                cat = "UNKNOWN"
-            changes[cat].append(path)
+        # handle renames — next null-delimited entry is the old path, skip it
+        if x in ("R", "C"):
+            i += 2  # current + old path
+        else:
+            i += 1
 
-        i += 1  # Single entries per null
+        if x == "?" and y == "?":
+            untracked.append(path)
+            continue
 
-    print(f"ALL CHANGES LIST:\n{dict(changes)}\n")
-    return dict(changes)
+        if x != " " and x in STAGED_MAP:
+            staged[STAGED_MAP[x]].append(path)
 
+        if y != " " and y in UNSTAGED_MAP:
+            unstaged[UNSTAGED_MAP[y]].append(path)
 
-if __name__ == "__main__":
-    analyze_all_changes()
+    return {
+        "staged": dict(staged),
+        "unstaged": dict(unstaged),
+        "untracked": {"UNTRACKED": untracked} if untracked else {},
+    }
